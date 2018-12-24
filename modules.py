@@ -4,6 +4,8 @@ from __future__ import print_function
 from config import get_config
 
 from tfutils import _init, _reg
+from tfutils import batch_norm
+from tfutils import conv1d
 
 import tensorflow as tf
 import numpy as np
@@ -16,6 +18,27 @@ cfg, _ = get_config()  # configuration
 # set random seed
 np.random.seed(cfg.seed)
 tf.set_random_seed(cfg.seed)
+
+
+def conv1d_banks(inputs, n_kernels=16, is_training=True, scope="conv1d_banks", reuse=None):
+    """ Series of conv1d separately
+    :param inputs: A 3D Tensor with shape of [batch, T, C]
+    :param n_kernels: An int, The size of conv1d banks.
+    :param is_training: A boolean.
+    :param scope: A str, Optional scope for 'variable_scope'.
+    :param reuse: A boolean. Whether to reuse the weights of a previous layer
+        by the same name.
+    :return: A 3D Tensor with shape of [batch, T, n_kernels * embed_size / 2]
+    """
+    with tf.variable_scope(scope, reuse=reuse):
+        outputs = conv1d(inputs, n_filters=cfg.embed_size // 2, kernel=1)
+        for k in range(2, n_kernels + 1):
+            with tf.variable_scope("ks-%d" % k) as scope:
+                x = conv1d(inputs, n_filters=cfg.embed_size // 2, kernel=k,
+                           scope="conv1d-%s" % scope)
+                outputs = tf.concat([outputs, x], axis=-1)
+        outputs = batch_norm(inputs, is_training=is_training, activation_fn=tf.nn.relu)
+    return outputs
 
 
 def attention_decoder(inputs, memory, num_units=None, attention_method='bahdanau',
