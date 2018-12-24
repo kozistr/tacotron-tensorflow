@@ -92,3 +92,33 @@ def conv1d(inputs,
                                    )
 
     return outputs
+
+
+def biGRU(inputs, num_units=None, bidirection=False, scope='biGRU', reuse=None):
+    """ bi-GRU
+    :param inputs: A 3D Tensor with shape of [batch, T, C]
+    :param num_units: An int. The number of hidden units.
+    :param bidirection: A boolean. If True, bidirectional results
+        are concatenated.
+    :param scope: A str, Optional scope for 'variable_scope'.
+    :param reuse: A boolean. Whether to reuse the weights of a previous layer
+        by the same name.
+    :return: If bidirection is True, a 3D Tensor with shape of [batch, T, 2 * num_units],
+        otherwise [batch, T, num_units]
+    """
+    if num_units is None:
+        num_units = inputs.get_shape().as_list[-1]
+
+    with tf.variable_scope(scope, reuse=reuse):
+        cell_fw = tf.contrib.rnn.GRUCell(num_units)
+
+        if bidirection:
+            cell_bw = tf.contrib.rnn.GRUCell(num_units)
+
+            outputs, _ = tf.nn.bidirectional_dynamic_rnn(cell_fw, cell_bw, inputs,
+                                                         dtype=tf.float32)
+            outputs = tf.concat(outputs, axis=2)
+        else:
+            outputs, _ = tf.nn.dynamic_rnn(cell_fw, inputs,
+                                           dtype=tf.float32)
+    return outputs
