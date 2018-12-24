@@ -19,6 +19,40 @@ np.random.seed(cfg.seed)
 tf.set_random_seed(cfg.seed)
 
 
+def attention_decoder(inputs, memory, num_units=None, attention_method='bahdanau',
+                      scope="attention_decoder", reuse=None):
+    """
+    :param inputs: A 3D tensor with shape of [batch, T', C']. Decoder inputs.
+    :param memory: A 3D tensor with shape of [batch, T, C]. Outputs of encoder network.
+    :param attention_method: A str. The name of attention mechanism.
+    :param num_units: An int, Attention size.
+    :param scope: A str, Optional scope for 'variable_scope'.
+    :param reuse: A boolean. Whether to reuse the weights of a previous layer
+        by the same name.
+    :return: A 3D Tensor with shape of [batch, T, num_units]
+    """
+    if num_units is None:
+        num_units = inputs.get_shape().as_list[-1]
+
+    att_mechanism = tf.contrib.seq2seq.BahdanauAttention \
+        if attention_method == "bahdanau" else tf.contrib.seq2seq.LuongAttention
+
+    with tf.variable_scope(scope, reuse=reuse):
+        decoder_cell = tf.contrib.rnn.GRUCell(num_units)
+
+        attention_mechanism = att_mechanism(num_units=num_units, memory=memory)
+
+        attention = tf.contrib.seq2seq.AttentionWrapper(cell=decoder_cell,
+                                                        attention_mechanism=attention_mechanism,
+                                                        attention_layer_size=num_units,
+                                                        alignment_history=True)
+
+        outputs, state = tf.nn.dynamic_rnn(attention, inputs,
+                                           dtype=tf.float32)
+
+    return outputs, state
+
+
 def prenet(inputs, num_units=None, is_training=True, scope='prenet', reuse=None):
     """ PreNet for Encoder and Decoder
     :param inputs: A 2D or 3D Tensor.
