@@ -5,6 +5,7 @@ from config import get_config
 
 from model import DeepVoiceV3
 from model import Tacotron2
+from model import Tacotron
 
 import tensorflow as tf
 import numpy as np
