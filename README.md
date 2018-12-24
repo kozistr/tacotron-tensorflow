@@ -7,6 +7,10 @@ highly inspired by [here](https://github.com/Rayhane-mamah/Tacotron-2)
 
 ## Requirements
 
+* Python 3.x
+* Tensorflow 1.x
+* numpy
+* tqdm
 
 ## Usage
 
@@ -19,8 +23,12 @@ highly inspired by [here](https://github.com/Rayhane-mamah/Tacotron-2)
 
 ## Model Architecture
 
+### Tacotron 2
 ![architecture](./assets/tacotron-2.png)
 
+### DeepVoice v3
+
+![architecture](./assets/deep_voice_3.png)
 
 ## Author
 
