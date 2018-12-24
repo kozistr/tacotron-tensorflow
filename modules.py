@@ -69,7 +69,7 @@ def highway_network(inputs, num_units=None, scope="highway", reuse=None):
     if num_units is None:
         num_units = inputs.get_shape().as_list()[-1]
 
-    with tf.variable_scope(scope):
+    with tf.variable_scope(scope, reuse=reuse):
         _h = tf.layers.dense(inputs=inputs, units=num_units,
                              activation=tf.nn.relu,
                              kernel_initializer=_init,
