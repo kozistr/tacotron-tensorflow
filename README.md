@@ -17,6 +17,11 @@ highly inspired by [here](https://github.com/Rayhane-mamah/Tacotron-2)
 ## Source Tree
 
 
+## Model Architecture
+
+![architecture](./assets/tacotron-2.png)
+
+
 ## Author
 
 HyeongChan Kim [@kozistr](http://kozistr.tech)
