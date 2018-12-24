@@ -49,7 +49,7 @@ data_arg.add_argument('--max_db', type=float, default=100.)
 data_arg.add_argument('--min_db', type=float, default=20.)
 data_arg.add_argument('--embed_size', type=int, default=256,
                       help='the size of character/word embedding vector')
-data_arg.add_argument('--vocab_size', type=int, default=391587)
+data_arg.add_argument('--vocab_size', type=int, default=251)
 data_arg.add_argument('--batch_size', type=int, default=32)
 
 
