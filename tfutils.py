@@ -122,3 +122,52 @@ def biGRU(inputs, num_units=None, bidirection=False, scope='biGRU', reuse=None):
             outputs, _ = tf.nn.dynamic_rnn(cell_fw, inputs,
                                            dtype=tf.float32)
     return outputs
+
+
+def batch_norm(inputs, is_training=True, activation_fn=None, scope="batch_norm", reuse=None):
+    """ Batch Normalization, referenced https://github.com/Kyubyong/tacotron/blob/master/modules.py#L43
+    :param inputs: A Tensor with 2 or more dimensions, where the first dim has 'batch_size'.
+
+    :param is_training: A boolean.
+    :param activation_fn: Activation function.
+    :param scope: A str, Optional scope for 'variable_scope'.
+    :param reuse: A boolean. Whether to reuse the weights of a previous layer
+        by the same name.
+    :return:
+    """
+    inputs_shape = inputs.get_shape()
+    inputs_rank = inputs_shape.ndims
+
+    if inputs_rank in [2, 3, 4]:
+        if not inputs_rank == 4:
+            inputs = tf.expand_dims(inputs, axis=1)
+        if inputs_rank == 2:
+            inputs = tf.expand_dims(inputs, axis=2)
+
+        outputs = tf.contrib.layers.batch_norm(inputs=inputs,
+                                               center=True,
+                                               scale=True,
+                                               updates_collections=None,
+                                               is_training=is_training,
+                                               scope=scope,
+                                               fused=True,
+                                               reuse=reuse)
+
+        if inputs_rank == 2:
+            outputs = tf.squeeze(outputs, axis=[1, 2])
+        elif inputs_rank == 3:
+            outputs = tf.squeeze(outputs, axis=1)
+    else:
+        outputs = tf.contrib.layers.batch_norm(inputs=inputs,
+                                               center=True,
+                                               scale=True,
+                                               updates_collections=None,
+                                               is_training=is_training,
+                                               scope=scope,
+                                               reuse=reuse,
+                                               fused=False)
+
+    if activation_fn is not None:
+        outputs = activation_fn(outputs)
+
+    return outputs
