@@ -4,7 +4,6 @@ from __future__ import print_function
 from config import get_config
 
 from tfutils import _init, _reg
-from tfutils import conv1d
 
 import tensorflow as tf
 import numpy as np
