@@ -27,7 +27,7 @@ def embedding_table(inputs, vocab_size, embed_size, zero_pad=False, trainable=Tr
     """
     Generating Embedding Table with given parameters
     :param inputs: A 'Tensor' with type 'int8' or 'int16' or 'int32' or 'int64'
-        containing the ids to be tooked up in 'lookup table'.
+        containing the ids to be looked up in 'lookup table'.
     :param vocab_size: An int. Vocabulary size.
     :param embed_size: An int. Number of size of embedding vector.
     :param zero_pad: A boolean. If True, all the values of the first low (id 0)
