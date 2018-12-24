@@ -25,8 +25,7 @@ _reg = tf.contrib.layers.l2_regularizer(cfg.l2_reg)
 
 def embedding_table(inputs, vocab_size, embed_size, zero_pad=False,
                     trainable=True, scope="embedding", reuse=None):
-    """
-    Generating Embedding Table with given parameters
+    """ Generating Embedding Table with given parameters
     :param inputs: A 'Tensor' with type 'int8' or 'int16' or 'int32' or 'int64'
         containing the ids to be looked up in 'lookup table'.
     :param vocab_size: An int. Vocabulary size.
@@ -56,8 +55,7 @@ def conv1d(inputs,
            n_filters=None, kernel=1, stride=1, dilated_rate=1,
            padding="SAME", use_bias=False, activation_fn=None,
            scope="conv1d", reuse=None):
-    """
-    Convolution 1D Operation
+    """ Convolution 1D Operation
     :param inputs: A '3D Tensor' with shape of [batch, time, depth]
     :param n_filters: An int, Conv1D filter size.
     :param kernel: An int. Conv1D kernel size.
