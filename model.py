@@ -35,7 +35,7 @@ class Tacotron:
                  vocab_size=251, embed_size=256, n_mels=80, n_fft=2048, reduction_factor=5,
                  n_encoder_banks=16, n_decoder_banks=8,
                  lr=1e-3, lr_decay=.95, optimizer="Adam", grad_clip=5.):
-        """ Tacotron 2 Architecture
+        """ Tacotron Architecture
         :param sess: A TF Session.
         :param mode: A str. Mode for train/test.
         :param sample_rate: An int, Number of sampling rate.
