@@ -58,13 +58,14 @@ train_arg = add_arg_group('Training')
 train_arg.add_argument('--is_train', type=bool, default=True)
 train_arg.add_argument('--epochs', type=int, default=10)
 train_arg.add_argument('--logging_step', type=int, default=500)
-train_arg.add_argument('--optimizer', type=str, default='adam', choices=['adam', 'sgd', 'adadelta'])
+train_arg.add_argument('--optimizer', type=str, default='adam', choices=['adam', 'sgd'])
 train_arg.add_argument('--l2_reg', type=float, default=5e-4)
 train_arg.add_argument('--grad_clip', type=float, default=5.)
 train_arg.add_argument('--lr', type=float, default=1e-3)
 train_arg.add_argument('--lr_decay', type=float, default=.75)
 train_arg.add_argument('--lr_lower_boundary', type=float, default=2e-5)
 train_arg.add_argument('--test_size', type=float, default=.2)
+train_arg.add_argument('--model_path', type=str, default="./model/")
 
 
 # Misc
