@@ -60,7 +60,7 @@ def spectrogram2wav(mag):
     mag = mag.T
 
     # De-Normalize
-    mag = (np.clip(mag, 0., 1.) * cfg.max_db) - cfg.max_db + cfg.min_db
+    mag = (np.clip(mag, 0., 1.) * cfg.max_db) - cfg.max_db + cfg.ref_db
 
     # To amplitude
     mag = np.power(10., mag * 0.05)

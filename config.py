@@ -46,7 +46,8 @@ data_arg.add_argument('--power', type=float, default=1.2,
 data_arg.add_argument('--n_iters', type=int, default=50)
 data_arg.add_argument('--preemphasis', type=float, default=.97)
 data_arg.add_argument('--max_db', type=float, default=100.)
-data_arg.add_argument('--min_db', type=float, default=20.)
+data_arg.add_argument('--min_db', type=float, default=-100.)
+data_arg.add_argument('--ref_db', type=float, default=20.)
 data_arg.add_argument('--embed_size', type=int, default=256,
                       help='the size of character/word embedding vector')
 data_arg.add_argument('--vocab_size', type=int, default=251)
