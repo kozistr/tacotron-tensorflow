@@ -23,6 +23,9 @@ highly inspired by [here](https://github.com/Rayhane-mamah/Tacotron-2)
 
 ## Model Architecture
 
+### Tacotron 1
+![architecture](./assets/tacotron-1.png)
+
 ### Tacotron 2
 ![architecture](./assets/tacotron-2.png)
 
