@@ -60,16 +60,16 @@ def spectrogram2wav(mag):
     mag = mag.T
 
     # De-Normalize
-    mag = (np.clip(mag, 0., 1.) * cfg.max_db) - cfg.max_db + cfg.ref_db
+    mag = (np.clip(mag, 0., 1.) * cfg.max_db) - cfg.max_db + cfg.min_db
 
     # To amplitude
-    mag = np.power(cfg.power, mag * 0.05)
+    mag = np.power(10., mag * 0.05)
 
     # Wav reconstruction
     wav = griffin_lim(mag)
 
     # De-Preemphasis
-    wav = signal.lfilter([1], [1, -hp.preemphasis], wav)
+    wav = signal.lfilter([1], [1, -cfg.preemphasis], wav)
 
     # Trim
     wav, _ = librosa.effects.trim(wav)
