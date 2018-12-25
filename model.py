@@ -33,8 +33,9 @@ class Tacotron:
 
     def __init__(self, sess, mode="train", sample_rate=22050,
                  vocab_size=251, embed_size=256, n_mels=80, n_fft=2048, reduction_factor=5,
-                 n_encoder_banks=16, n_decoder_banks=8,
-                 lr=1e-3, lr_decay=.95, optimizer="Adam", grad_clip=5.):
+                 n_encoder_banks=16, n_decoder_banks=8, n_highway_blocks=4,
+                 lr=1e-3, lr_decay=.95, optimizer="Adam", grad_clip=5.,
+                 model_path="./model"):
         """ Tacotron Architecture
         :param sess: A TF Session.
         :param mode: A str. Mode for train/test.
@@ -46,10 +47,12 @@ class Tacotron:
         :param reduction_factor: An int.
         :param n_encoder_banks: An int. Number of layers of conv banks in Encoder
         :param n_decoder_banks: An int. Number of layers of conv banks in Decoder
+        :param n_highway_blocks: An int. Number of layers of highway network
         :param lr: A float, Learning rate.
         :param lr_decay: A float, Learning rate decay factor.
         :param optimizer: A str. Name of Optimizer.
         :param grad_clip: A float. Norm of gradients to clip.
+        :param model_path: A str. Path where the model is saved
         """
         self.sess = sess
         self.sample_rate = sample_rate
@@ -60,10 +63,12 @@ class Tacotron:
         self.reduction_factor = reduction_factor
         self.n_encoder_banks = n_encoder_banks
         self.n_decoder_banks = n_decoder_banks
+        self.n_highway_blocks = n_highway_blocks
         self.lr = lr
         self.lr_decay = lr_decay
         self.optimizer = optimizer.lower()
         self.grad_clip = grad_clip
+        self.model_path = model_path
 
         self.is_training = True if mode.lower() == "train" else False
 
@@ -133,7 +138,7 @@ class Tacotron:
 
             # highway networks
             if use_highway_network:
-                for i in range(cfg.n_highway_blocks):
+                for i in range(self.n_highway_blocks):
                     enc = highway_network(enc,
                                           num_units=self.embed_size // 2,
                                           scope="highway_network-%d" % i)
@@ -186,7 +191,7 @@ class Tacotron:
             x = tf.reshape(inputs, (-1, inputs_shape[1] * self.reduction_factor, self.n_mels))
 
             # Decoder Convolutional Block
-            dec = conv1d_banks(x, n_kernels=cfg.n_decoder_banks, is_training=is_training)
+            dec = conv1d_banks(x, n_kernels=self.n_decoder_banks, is_training=is_training)
             dec = tf.layers.max_pooling1d(dec, pool_size=2, strides=1, padding='SAME')
 
             # Encoder PostNet
@@ -202,14 +207,14 @@ class Tacotron:
 
             # highway networks
             if use_highway_network:
-                for i in range(cfg.n_highway_blocks):
+                for i in range(self.n_highway_blocks):
                     dec = highway_network(dec,
                                           num_units=self.embed_size // 2,
                                           scope="highway_network-%d" % i)
 
             dec = biGRU(dec, num_units=self.embed_size // 2, bidirection=True)
 
-            outputs = tf.layers.dense(dec, units=1 + cfg.n_fft // 2,
+            outputs = tf.layers.dense(dec, units=1 + self.n_fft // 2,
                                       kernel_initializer=_init,
                                       kernel_regularizer=_reg)
         return outputs
@@ -276,7 +281,7 @@ class Tacotron:
 
         # Model Saver
         self.saver = tf.train.Saver(max_to_keep=1)
-        self.writer = tf.summary.FileWriter(cfg.model_path, self.sess.graph)
+        self.writer = tf.summary.FileWriter(self.model_path, self.sess.graph)
 
 
 class Tacotron2:
