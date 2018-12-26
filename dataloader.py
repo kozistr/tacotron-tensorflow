@@ -122,21 +122,20 @@ class Char2VecEmbeddings:
 
 class DataIterator:
 
-    def __init__(self, x_text, x_mel, x_mag, y, batch_size):
+    def __init__(self, text, mel, mag, batch_size):
         """ DataLoader
-        :param x_text: An Numpy Object. Text data.
-        :param x_mel: An Numpy Object. mel-spectrogram data.
-        :param x_mag: An Numpy Object. magnitude data.
+        :param text: An Numpy Object. Text data.
+        :param mel: An Numpy Object. mel-spectrogram data.
+        :param mag: An Numpy Object. magnitude data.
         :param y: An Numpy Object. Label audio.
         :param batch_size: An int. Batch size.
         """
-        self.x_text = x_text
-        self.x_mel = x_mel
-        self.x_mag = x_mag
-        self.y = y
+        self.text = text
+        self.mel = mel
+        self.mag = mag
         self.batch_size = batch_size
 
-        self.num_examples = num_examples = x_text.shape[0]
+        self.num_examples = num_examples = text.shape[0]
         self.num_batches = num_examples // batch_size
         self.pointer = 0
 
@@ -150,17 +149,16 @@ class DataIterator:
             perm = np.arange(self.num_examples)
             np.random.shuffle(perm)
 
-            self.x_text = self.x_text[perm]
-            self.x_mel = self.x_mel[perm]
-            self.x_mag = self.x_mag[perm]
-            self.y = self.y[perm]
+            self.text = self.text[perm]
+            self.mel = self.mel[perm]
+            self.mag = self.mag[perm]
 
             start = 0
             self.pointer = self.batch_size
 
         end = self.pointer
 
-        return [self.x_text[start:end], self.x_mel[start:end], self.x_mag[start:end]], self.y[start:end]
+        return self.text[start:end], self.mel[start:end], self.mag[start:end]
 
     def iterate(self):
         for step in range(self.num_batches):
