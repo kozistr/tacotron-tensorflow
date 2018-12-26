@@ -24,22 +24,18 @@ np.random.seed(cfg.seed)
 
 class LJSpeech:
 
-    def __init__(self, path, fn=None, save_to="npy", load_from=None):
+    def __init__(self, path, save_to="npy", load_from=None):
         """ LJSpeech-1.1 DataSet Loader, reference : https://github.com/Kyubyong/tacotron/blob/master/data_load.py
         :param path: A str. DataSet's path.
-        :param fn: A str. Pre-Processed data file name (or to save).
         :param save_to: A str. File type to save dataset.
         :param load_from: A str. File type for loading dataset.
         """
         self.path = path
-        self.fn = fn
         self.save_to = save_to
         self.load_from = load_from
 
         # Several Sanity Check
         assert os.path.isdir(self.path)
-        if self.fn is not None:
-            assert os.path.isfile(self.fn)
         assert (self.save_to is None or self.save_to == "npy")
         assert (self.load_from is None or self.load_from == "npy")
 
@@ -83,13 +79,17 @@ class LJSpeech:
 
         for d in tqdm(data):
             file_name, _, text = d.strip().split("|")  # split by '|'
-
             file_path = os.path.join(self.audio_data_path, file_name + ".wav")  # audio file path
 
-            mel, mag = load_spectrogram(file_path)
-            self.audio_files.append(file_path)
-            self.mels.append(mel)  # (None, n_mels * sample_rate)
-            self.mags.append(mag)  # (None, 1 + n_fft // 2)
+            if self.load_from is None:
+                mel, mag = load_spectrogram(file_path)
+
+                self.audio_files.append(file_path)
+                self.mels.append(mel)  # (None, n_mels * sample_rate)
+                self.mags.append(mag)  # (None, 1 + n_fft // 2)
+            else:
+                self.mels.append(np.load("npy/" + file_path + "-mel.npy"))
+                self.mags.append(np.load("npy/" + file_path + "-mag.npy"))
 
             text = self.normalize(text) + "E"
             text = [self.c2i[char] for char in text]
@@ -100,6 +100,6 @@ class LJSpeech:
         if not os.path.exists("npy"):
             os.mkdir("npy")
 
-        for mel, mag in tqdm(zip(self.mels, self.mags)):
-            np.save("npy/" + self.fn + "-mel.npy", mel)
-            np.save("npy/" + self.fn + "-mag.npy", mag)
+        for mel, mag, fn in tqdm(zip(self.mels, self.mags, self.audio_files)):
+            np.save("npy/" + fn + "-mel.npy", mel)
+            np.save("npy/" + fn + "-mag.npy", mag)
