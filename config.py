@@ -22,7 +22,7 @@ def get_config():
 
 # Network
 network_arg = add_arg_group('Network')
-network_arg.add_argument('--model', type=str)
+network_arg.add_argument('--model', type=str, default="Tacotron", choices=["Tacotron"])
 network_arg.add_argument('--n_encoder_banks', type=int, default=16)
 network_arg.add_argument('--n_decoder_banks', type=int, default=8)
 network_arg.add_argument('--n_highway_blocks', type=int, default=4)
