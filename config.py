@@ -52,6 +52,7 @@ data_arg.add_argument('--embed_size', type=int, default=256,
                       help='the size of character/word embedding vector')
 data_arg.add_argument('--vocab_size', type=int, default=251)
 data_arg.add_argument('--batch_size', type=int, default=32)
+data_arg.add_argument('--dataset_path', type=str, default="D:/DataSet/LJSpeech-1.1/")
 
 
 # Train/Test hyper-parameters
