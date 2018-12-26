@@ -95,7 +95,6 @@ class Tacotron:
                                 name="y-mel_spectrogram")  # (N, T_y // r, n_mels * r)
         self.z = tf.placeholder(tf.float32, shape=(None, None, 1 + self.n_fft // 2),
                                 name="z-magnitude")  # (N, T_y, 1 + n_fft // 2)
-        self.fnames = tf.placeholder(tf.string, shape=(None,), name="fnames")
 
         # global step
         self.global_step = tf.Variable(0, name='global_step', trainable=False)
