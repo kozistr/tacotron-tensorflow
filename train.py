@@ -11,6 +11,7 @@ from model import Tacotron
 import tensorflow as tf
 import numpy as np
 import argparse
+import time
 
 
 __AUTHOR__ = "kozistr"
@@ -79,9 +80,45 @@ def main():
         else:
             print('[-] No checkpoint file found')
 
-        for epoch in range(cfg.epoch):
-            for text, mel, mag in di.next_batch():
-                pass
+        start_time = time.time()
+
+        batch_size = config.batch_size
+        model.global_step.assign(tf.constant(global_step))
+        restored_epochs = global_step // (di.text.shape[0] // batch_size)
+        for epoch in range(restored_epochs, cfg.epoch):
+            for text, mel, mag in di.iterate():
+                _, y_loss, z_loss = sess.run([model.train_op, model.y_loss, model.z_loss],
+                                             feed_dict={
+                                                 model.x: text,
+                                                 model.y: mel,
+                                                 model.z: mag,
+                                             })
+
+                if global_step and global_step % cfg.logging_step == 0:
+                    print("[*] epoch %03d global step %07d" % (epoch, global_step),
+                          " y_loss : {:.8f} z_loss : {:.4f}".format(y_loss, z_loss))
+
+                    # summary
+                    summary = sess.run(model.merged,
+                                       feed_dict={
+                                           model.x: text,
+                                           model.y: mel,
+                                           model.z: mag,
+                                       })
+
+                    # Summary saver
+                    model.writer.add_summary(summary, global_step)
+
+                    # Model save
+                    model.saver.save(sess, cfg.model_path + '%s.ckpt' % cfg.model,
+                                     global_step=global_step)
+
+                model.global_step.assign_add(tf.constant(1))
+                global_step += 1
+
+        end_time = time.time()
+
+        print("[+] Training Done! Elapsed {:.8f}s".format(end_time - start_time))
 
 
 if __name__ == "__main__":
