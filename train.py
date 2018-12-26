@@ -3,6 +3,7 @@ from __future__ import print_function
 
 from config import get_config
 
+from dataloader import DataIterator
 from model import DeepVoiceV3
 from model import Tacotron2
 from model import Tacotron
@@ -23,10 +24,24 @@ tf.set_random_seed(cfg.seed)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--mode', type=str, default="train", choices=["train", "test"])
+parser.add_argument('--dataset', type=str, default="ljspeech", choices=["ljspeech"])
 args = parser.parse_args()
 
 
 def main():
+    # DataSet Loader
+    if args.dataset == "ljspeech":
+        from datasets.ljspeech import LJSpeech
+
+        ljs = LJSpeech(path=cfg.dataset_path,
+                       save_to='npy')  # LJSpeech-1.1 dataset loader
+    else:
+        raise NotImplementedError("[-] Not Implemented Yet...")
+
+    # Data Iterator
+    di = DataIterator(text=ljs.text_data, mel=ljs.mels, mag=ljs.mags,
+                      batch_size=cfg.batch_size)
+
     # Model Loading
     gpu_config = tf.GPUOptions(allow_growth=True)
     config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=False, gpu_options=gpu_config)
@@ -63,6 +78,10 @@ def main():
             print("[+] global step : %d" % global_step, " successfully loaded")
         else:
             print('[-] No checkpoint file found')
+
+        for epoch in range(cfg.epoch):
+            for text, mel, mag in di.next_batch():
+                pass
 
 
 if __name__ == "__main__":
