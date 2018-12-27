@@ -31,7 +31,6 @@ args = parser.parse_args()
 
 
 def main():
-    """
     # DataSet Loader
     if args.dataset == "ljspeech":
         from datasets.ljspeech import LJSpeech
@@ -51,8 +50,6 @@ def main():
 
     del ljs  # memory release
 
-    :return:
-    """
     # Model Loading
     gpu_config = tf.GPUOptions(allow_growth=True)
     config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=False, gpu_options=gpu_config)
@@ -92,7 +89,7 @@ def main():
 
         start_time = time.time()
 
-        batch_size = config.batch_size
+        batch_size = cfg.batch_size
         model.global_step.assign(tf.constant(global_step))
         restored_epochs = global_step // (di.text.shape[0] // batch_size)
         for epoch in range(restored_epochs, cfg.epoch):
