@@ -43,7 +43,7 @@ def main():
         raise NotImplementedError("[-] Not Implemented Yet...")
 
     # Data Iterator
-    di = DataIterator(text=np.array(ljs.text_data).astype(np.int32),
+    di = DataIterator(text=np.array(ljs.text_data),
                       mel=np.array(ljs.mels),
                       mag=np.array(ljs.mags),
                       batch_size=cfg.batch_size)
