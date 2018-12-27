@@ -184,10 +184,9 @@ class Tacotron:
         :param reuse: A boolean. Whether to reuse the weights of a previous layer
         :return:
         """
-        inputs_shape = inputs.get_shape().as_list()
-
         with tf.variable_scope(scope, reuse=reuse):
-            x = tf.reshape(inputs, (-1, inputs_shape[1] * self.reduction_factor, self.n_mels))
+            x = tf.split(inputs, self.reduction_factor, axis=-1)
+            x = tf.concat(x, axis=1)
 
             # Decoder Convolutional Block
             dec = conv1d_banks(x, n_kernels=self.n_decoder_banks, is_training=is_training)
@@ -243,7 +242,7 @@ class Tacotron:
         # Optimizer
         learning_rate = tf.train.exponential_decay(self.lr,
                                                    self.global_step,
-                                                   10 * 1,  # 1 epoch
+                                                   100 * 1,  # 1 epoch
                                                    self.lr_decay,
                                                    staircase=True)
 
@@ -274,7 +273,7 @@ class Tacotron:
         tf.summary.image("z/mel_gt", tf.expand_dims(self.z, axis=-1), max_outputs=1)
         tf.summary.image("z/mel_hat", tf.expand_dims(self.y_hat, axis=-1), max_outputs=1)
 
-        tf.summary.audio("sample", tf.expand_dims(self.audio, axis=0), max_outputs=self.sample_rate)
+        tf.summary.audio("sample", tf.expand_dims(self.audio, axis=0), sample_rate=self.sample_rate)
 
         self.merged = tf.summary.merge_all()  # merge summaries
 
