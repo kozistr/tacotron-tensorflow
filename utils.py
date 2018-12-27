@@ -39,8 +39,8 @@ def griffin_lim(spectrogram):
     :param spectrogram: [f, t]
     :return:
     """
-    hop_length = cfg.sample_rate * cfg.frame_shift
-    win_length = cfg.sample_rate * cfg.frame_length
+    hop_length = int(cfg.sample_rate * cfg.frame_shift)
+    win_length = int(cfg.sample_rate * cfg.frame_length)
 
     x_best = copy.deepcopy(spectrogram)
     for i in range(cfg.n_iter):
@@ -82,7 +82,7 @@ def spectrogram2wav(mag):
 def get_spectrogram(path):
     """ Getting normalized log spectrogram from the audio file
     :param path: A str. Full path of an audio file.
-    :return: 2D Array of shape (T, n_mels) / (T, 1 + n_fft // 2)
+    :return: 2D Arrays of shape (T, n_mels) / (T, 1 + n_fft // 2)
     """
     # Loading sound file
     y, sr = librosa.load(path, sr=cfg.sample_rate)
@@ -94,8 +94,8 @@ def get_spectrogram(path):
     y = np.append(y[0], y[1:] - cfg.preemphasis * y[:-1])
 
     # STFT
-    hop_length = cfg.sample_rate * cfg.frame_shift
-    win_length = cfg.sample_rate * cfg.frame_length
+    hop_length = int(cfg.sample_rate * cfg.frame_shift)
+    win_length = int(cfg.sample_rate * cfg.frame_length)
 
     linear = librosa.stft(y=y,
                           n_fft=cfg.n_fft,
@@ -127,8 +127,8 @@ def load_spectrogram(path):
     mel, mag = get_spectrogram(path)
 
     ts = mel.shape[0]
-    n_pads = cfg.r - (ts % cfg.r) if ts % cfg.r != 0 else 0  # for reduction
+    n_pads = cfg.reduction_factor - (ts % cfg.reduction_factor) if ts % cfg.reduction_factor != 0 else 0
 
-    mel = np.pad(mel, [[0, n_pads], [0, 0]], mode="constant").reshape((-1, cfg.n_mels * cfg.r))
+    mel = np.pad(mel, [[0, n_pads], [0, 0]], mode="constant").reshape((-1, cfg.n_mels * cfg.reduction_factor))
     mag = np.pad(mag, [[0, n_pads], [0, 0]], mode="constant")
     return mel, mag
