@@ -84,7 +84,7 @@ class LJSpeech:
             if self.load_from is None:
                 mel, mag = load_spectrogram(file_path)
 
-                self.audio_files.append(file_path)
+                self.audio_files.append(file_name)
                 self.mels.append(mel)  # (None, n_mels * sample_rate)
                 self.mags.append(mag)  # (None, 1 + n_fft // 2)
             else:
@@ -101,5 +101,5 @@ class LJSpeech:
             os.mkdir("npy")
 
         for mel, mag, fn in tqdm(zip(self.mels, self.mags, self.audio_files)):
-            np.save("npy/" + fn + "-mel.npy", mel)
-            np.save("npy/" + fn + "-mag.npy", mag)
+            np.save("./npy/" + fn + "-mel.npy", mel)
+            np.save("./npy/" + fn + "-mag.npy", mag)
