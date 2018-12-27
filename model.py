@@ -242,7 +242,7 @@ class Tacotron:
         # Optimizer
         learning_rate = tf.train.exponential_decay(self.lr,
                                                    self.global_step,
-                                                   100 * 1,  # 1 epoch
+                                                   327,  # 1 epoch, 327.5 GS
                                                    self.lr_decay,
                                                    staircase=True)
 
