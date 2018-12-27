@@ -89,7 +89,7 @@ class Tacotron:
         self.saver = None
 
         # placeholders
-        self.x = tf.placeholder(tf.int32, shape=(None, None),
+        self.x = tf.placeholder(tf.uint8, shape=(None, None),
                                 name="x-text")  # (N, T_x)
         self.y = tf.placeholder(tf.float32, shape=(None, None, self.n_mels * self.reduction_factor),
                                 name="y-mel_spectrogram")  # (N, T_y // r, n_mels * r)

@@ -46,7 +46,6 @@ class LJSpeech:
 
         # Text data
         self.text_data = list()
-        self.text_len_data = list()
         # Audio data
         self.audio_files = list()
         self.mels, self.mags = list(), list()
@@ -58,6 +57,11 @@ class LJSpeech:
 
         if self.save_to is not None:
             self.save()
+
+        # To Numpy Array
+        self.text_data = np.array(self.text_data).astype(np.uint8)
+        self.mels = np.array(self.mels).astype(np.float32)
+        self.mags = np.array(self.mags).astype(np.float32)
 
     def char2idx(self):
         return {char: idx for idx, char in enumerate(self.vocab)}
@@ -94,7 +98,6 @@ class LJSpeech:
 
             text = self.normalize(text) + "E"
             text = [self.c2i[char] for char in text]
-            self.text_len_data.append(len(text))
             self.text_data.append(np.array(text, dtype=np.int32).tostring())
 
     def save(self):
