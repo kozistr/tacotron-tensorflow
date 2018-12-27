@@ -38,13 +38,17 @@ def main():
         # LJSpeech-1.1 dataset loader
         ljs = LJSpeech(path=cfg.dataset_path,
                        save_to='npy',
-                       load_from=None if os.path.exists(cfg.dataset_path + "/npy") else "npy")
+                       load_from=None if not os.path.exists(cfg.dataset_path + "/npy") else "npy")
     else:
         raise NotImplementedError("[-] Not Implemented Yet...")
 
     # Data Iterator
-    di = DataIterator(text=ljs.text_data, mel=ljs.mels, mag=ljs.mags,
+    di = DataIterator(text=np.array(ljs.text_data),
+                      mel=np.array(ljs.mels),
+                      mag=np.array(ljs.mags),
                       batch_size=cfg.batch_size)
+
+    del ljs  # memory release
 
     # Model Loading
     gpu_config = tf.GPUOptions(allow_growth=True)
@@ -61,7 +65,7 @@ def main():
                          reduction_factor=cfg.reduction_factor,
                          n_encoder_banks=cfg.n_encoder_banks,
                          n_decoder_banks=cfg.n_decoder_banks,
-                         n_highway_blocks=cfg.n_highway_banks,
+                         n_highway_blocks=cfg.n_highway_blocks,
                          lr=cfg.lr,
                          lr_decay=cfg.lr_decay,
                          optimizer=cfg.optimizer,
