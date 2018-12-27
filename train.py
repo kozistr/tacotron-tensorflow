@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
-from config import get_config
-
 from dataloader import DataIterator
+from config import get_config
 from model import DeepVoiceV3
 from model import Tacotron2
 from model import Tacotron
@@ -42,35 +41,45 @@ def main():
     else:
         raise NotImplementedError("[-] Not Implemented Yet...")
 
-    # Data Iterator
-    di = DataIterator(text=np.array(ljs.text_data),
-                      mel=np.array(ljs.mels),
-                      mag=np.array(ljs.mags),
-                      batch_size=cfg.batch_size)
+    # Train/Test split
+    tr_size = int(len(ljs) * cfg.test_size)
+    ljs.text_data = np.array(ljs.text_data)
+    ljs.mels, ljs.mags = np.array(ljs.mels),  np.array(ljs.mags)
+
+    tr_text_data, va_text_data = ljs.text_data[:tr_size], ljs.text_data[tr_size:]
+    tr_mels, va_mels = ljs.mels[:tr_size], ljs.mels[tr_size:]
+    tr_mags, va_mags = ljs.mags[:tr_size], ljs.mags[tr_size:]
 
     del ljs  # memory release
+
+    # Data Iterator
+    di = DataIterator(text=tr_text_data, mel=tr_mels, mag=tr_mags,
+                      batch_size=cfg.batch_size)
 
     # Model Loading
     gpu_config = tf.GPUOptions(allow_growth=True)
     config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=False, gpu_options=gpu_config)
 
     with tf.Session(config=config) as sess:
-        model = Tacotron(sess=sess,
-                         mode=args.mode,
-                         sample_rate=cfg.sample_rate,
-                         vocab_size=cfg.vocab_size,
-                         embed_size=cfg.embed_size,
-                         n_mels=cfg.n_mels,
-                         n_fft=cfg.n_fft,
-                         reduction_factor=cfg.reduction_factor,
-                         n_encoder_banks=cfg.n_encoder_banks,
-                         n_decoder_banks=cfg.n_decoder_banks,
-                         n_highway_blocks=cfg.n_highway_blocks,
-                         lr=cfg.lr,
-                         lr_decay=cfg.lr_decay,
-                         optimizer=cfg.optimizer,
-                         grad_clip=cfg.grad_clip,
-                         model_path=cfg.model_path)
+        if cfg.model == "Tacotron":
+            model = Tacotron(sess=sess,
+                             mode=args.mode,
+                             sample_rate=cfg.sample_rate,
+                             vocab_size=cfg.vocab_size,
+                             embed_size=cfg.embed_size,
+                             n_mels=cfg.n_mels,
+                             n_fft=cfg.n_fft,
+                             reduction_factor=cfg.reduction_factor,
+                             n_encoder_banks=cfg.n_encoder_banks,
+                             n_decoder_banks=cfg.n_decoder_banks,
+                             n_highway_blocks=cfg.n_highway_blocks,
+                             lr=cfg.lr,
+                             lr_decay=cfg.lr_decay,
+                             optimizer=cfg.optimizer,
+                             grad_clip=cfg.grad_clip,
+                             model_path=cfg.model_path)
+        else:
+            raise NotImplementedError("[-] Not Implemented Yet...")
 
         # Initializing
         sess.run(tf.global_variables_initializer())
@@ -92,7 +101,7 @@ def main():
         batch_size = cfg.batch_size
         model.global_step.assign(tf.constant(global_step))
         restored_epochs = global_step // (di.text.shape[0] // batch_size)
-        for epoch in range(restored_epochs, cfg.epoch):
+        for epoch in range(restored_epochs, cfg.epochs):
             for text, mel, mag in di.iterate():
                 _, y_loss, z_loss = sess.run([model.train_op, model.y_loss, model.z_loss],
                                              feed_dict={
@@ -102,15 +111,37 @@ def main():
                                              })
 
                 if global_step and global_step % cfg.logging_step == 0:
+                    va_y_loss, va_z_loss = 0., 0.
+
+                    va_batch = 20
+                    va_iter = len(va_text_data)
+                    for idx in range(0, va_iter, va_batch):
+                        va_y, va_z = sess.run([model.y_loss, model.z_loss],
+                                              feed_dict={
+                                                  model.x: va_text_data[va_batch * idx:va_batch * (idx + 1)],
+                                                  model.y: va_mels[va_batch * idx:va_batch * (idx + 1)],
+                                                  model.z: va_mags[va_batch * idx:va_batch * (idx + 1)],
+                                              })
+
+                        va_y_loss += va_y
+                        va_z_loss += va_z
+
+                    va_y_loss /= (va_iter // va_batch)
+                    va_z_loss /= (va_iter // va_batch)
+
                     print("[*] epoch %03d global step %07d" % (epoch, global_step),
-                          " y_loss : {:.8f} z_loss : {:.4f}".format(y_loss, z_loss))
+                          " Train \n"
+                          " y_loss : {:.8f} z_loss : {:.4f}".format(y_loss, z_loss),
+                          " Valid \n"
+                          " y_loss : {:.8f} z_loss : {:.4f}".format(va_y_loss, va_z_loss)
+                          )
 
                     # summary
                     summary = sess.run(model.merged,
                                        feed_dict={
-                                           model.x: text,
-                                           model.y: mel,
-                                           model.z: mag,
+                                           model.x: va_text_data[:batch_size * 4],
+                                           model.y: va_mels[:batch_size * 4],
+                                           model.z: va_mags[:batch_size * 4],
                                        })
 
                     # Summary saver
