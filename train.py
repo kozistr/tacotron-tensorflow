@@ -37,7 +37,8 @@ def main():
         # LJSpeech-1.1 dataset loader
         ljs = LJSpeech(path=cfg.dataset_path,
                        save_to='npy',
-                       load_from=None if not os.path.exists(cfg.dataset_path + "/npy") else "npy")
+                       load_from=None if not os.path.exists(cfg.dataset_path + "/npy") else "npy",
+                       verbose=cfg.verbose)
     else:
         raise NotImplementedError("[-] Not Implemented Yet...")
 
@@ -46,15 +47,27 @@ def main():
     ljs.text_data = np.array(ljs.text_data)
     ljs.mels, ljs.mags = np.array(ljs.mels),  np.array(ljs.mags)
 
-    tr_text_data, va_text_data = ljs.text_data[:tr_size], ljs.text_data[tr_size:]
-    tr_mels, va_mels = ljs.mels[:tr_size], ljs.mels[tr_size:]
-    tr_mags, va_mags = ljs.mags[:tr_size], ljs.mags[tr_size:]
+    tr_text_data, va_text_data = ljs.text_data[:tr_size, :], ljs.text_data[tr_size:, :]
+    tr_mels, va_mels = ljs.mels[:tr_size, :, :], ljs.mels[tr_size:, :, :]
+    tr_mags, va_mags = ljs.mags[:tr_size, :, :], ljs.mags[tr_size:, :, :]
 
     del ljs  # memory release
 
     # Data Iterator
     di = DataIterator(text=tr_text_data, mel=tr_mels, mag=tr_mags,
                       batch_size=cfg.batch_size)
+
+    if cfg.verbose:
+        print("[*] Train/Test split : %d/%d (%.2f/%.2f)" % (tr_text_data.shape[0], va_text_data.shape[0],
+                                                            1. - cfg.test_size, cfg.test_size))
+        print("  Train")
+        print("\ttext : ", tr_text_data.shape)
+        print("\tmels : ", tr_mels.shape)
+        print("\tmags : ", tr_mags.shape)
+        print("  Test")
+        print("\ttext : ", va_text_data.shape)
+        print("\tmels : ", va_mels.shape)
+        print("\tmags : ", va_mags.shape)
 
     # Model Loading
     gpu_config = tf.GPUOptions(allow_growth=True)
