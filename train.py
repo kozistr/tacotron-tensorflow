@@ -12,6 +12,7 @@ import tensorflow as tf
 import numpy as np
 import argparse
 import time
+import os
 
 
 __AUTHOR__ = "kozistr"
@@ -34,8 +35,10 @@ def main():
     if args.dataset == "ljspeech":
         from datasets.ljspeech import LJSpeech
 
+        # LJSpeech-1.1 dataset loader
         ljs = LJSpeech(path=cfg.dataset_path,
-                       save_to='npy')  # LJSpeech-1.1 dataset loader
+                       save_to='npy',
+                       load_from=None if os.path.exists(cfg.dataset_path + "/npy") else "npy")
     else:
         raise NotImplementedError("[-] Not Implemented Yet...")
 
