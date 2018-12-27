@@ -39,6 +39,7 @@ class LJSpeech:
         assert (self.save_to is None or self.save_to == "npy")
         assert (self.load_from is None or self.load_from == "npy")
 
+        self.processed_path = self.path + "/npy"
         self.metadata_path = os.path.join(self.path, "metadata.csv")
         self.audio_data_path = os.path.join(self.path, "wavs")
         self.vocab = "PE abcdefghijklmnopqrstuvwxyz'.?"  # P : Padding, E : EoS
@@ -88,8 +89,8 @@ class LJSpeech:
                 self.mels.append(mel)  # (None, n_mels * sample_rate)
                 self.mags.append(mag)  # (None, 1 + n_fft // 2)
             else:
-                self.mels.append(np.load("npy/" + file_path + "-mel.npy"))
-                self.mags.append(np.load("npy/" + file_path + "-mag.npy"))
+                self.mels.append(np.load(self.processed_path + file_path + "-mel.npy"))
+                self.mags.append(np.load(self.processed_path + file_path + "-mag.npy"))
 
             text = self.normalize(text) + "E"
             text = [self.c2i[char] for char in text]
@@ -97,9 +98,9 @@ class LJSpeech:
             self.text_data.append(np.array(text, dtype=np.int32).tostring())
 
     def save(self):
-        if not os.path.exists("npy"):
-            os.mkdir("npy")
+        if not os.path.exists(self.processed_path):
+            os.mkdir(self.processed_path)
 
         for mel, mag, fn in tqdm(zip(self.mels, self.mags, self.audio_files)):
-            np.save("./npy/" + fn + "-mel.npy", mel)
-            np.save("./npy/" + fn + "-mag.npy", mag)
+            np.save(self.processed_path + fn + "-mel.npy", mel)
+            np.save(self.processed_path + fn + "-mag.npy", mag)
