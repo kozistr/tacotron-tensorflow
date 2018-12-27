@@ -47,9 +47,9 @@ def main():
     ljs.text_data = np.array(ljs.text_data)
     ljs.mels, ljs.mags = np.array(ljs.mels),  np.array(ljs.mags)
 
-    tr_text_data, va_text_data = ljs.text_data[:tr_size, :], ljs.text_data[tr_size:, :]
-    tr_mels, va_mels = ljs.mels[:tr_size, :, :], ljs.mels[tr_size:, :, :]
-    tr_mags, va_mags = ljs.mags[:tr_size, :, :], ljs.mags[tr_size:, :, :]
+    tr_text_data, va_text_data = ljs.text_data[:tr_size], ljs.text_data[tr_size:]
+    tr_mels, va_mels = ljs.mels[:tr_size, :], ljs.mels[tr_size:, :]
+    tr_mags, va_mags = ljs.mags[:tr_size, :], ljs.mags[tr_size:, :]
 
     del ljs  # memory release
 
