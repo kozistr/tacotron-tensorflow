@@ -31,6 +31,7 @@ args = parser.parse_args()
 
 
 def main():
+    """
     # DataSet Loader
     if args.dataset == "ljspeech":
         from datasets.ljspeech import LJSpeech
@@ -50,6 +51,8 @@ def main():
 
     del ljs  # memory release
 
+    :return:
+    """
     # Model Loading
     gpu_config = tf.GPUOptions(allow_growth=True)
     config = tf.ConfigProto(allow_soft_placement=True, log_device_placement=False, gpu_options=gpu_config)
