@@ -33,9 +33,9 @@ def conv1d_banks(inputs, n_kernels=16, is_training=True, scope="conv1d_banks", r
     with tf.variable_scope(scope, reuse=reuse):
         outputs = conv1d(inputs, n_filters=cfg.embed_size // 2, kernel=1)
         for k in range(2, n_kernels + 1):
-            with tf.variable_scope("ks-%d" % k) as scope:
+            with tf.variable_scope("ks-%d" % k):
                 x = conv1d(inputs, n_filters=cfg.embed_size // 2, kernel=k,
-                           scope="conv1d-%s" % scope)
+                           scope="conv1d-%s" % k)
                 outputs = tf.concat([outputs, x], axis=-1)
         outputs = batch_norm(inputs, is_training=is_training, activation_fn=tf.nn.relu)
     return outputs
@@ -56,10 +56,10 @@ def attention_decoder(inputs, memory, num_units=None, attention_method='bahdanau
     if num_units is None:
         num_units = inputs.get_shape().as_list[-1]
 
-    att_mechanism = tf.contrib.seq2seq.BahdanauAttention \
-        if attention_method == "bahdanau" else tf.contrib.seq2seq.LuongAttention
-
     with tf.variable_scope(scope, reuse=reuse):
+        att_mechanism = tf.contrib.seq2seq.BahdanauAttention \
+            if attention_method == "bahdanau" else tf.contrib.seq2seq.LuongAttention
+
         decoder_cell = tf.contrib.rnn.GRUCell(num_units)
 
         attention_mechanism = att_mechanism(num_units=num_units, memory=memory)
