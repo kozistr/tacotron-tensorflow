@@ -44,31 +44,39 @@ def main():
 
     # Train/Test split
     tr_size = int(len(ljs) * (1. - cfg.test_size))
+
     ljs.text_data = np.array(ljs.text_data)
+    ljs.text_len_data = np.array(ljs.text_len_data)
     ljs.mels = np.array(ljs.mels)  # .reshape((-1, cfg.n_mels * cfg.sample_rate))
     ljs.mags = np.array(ljs.mags)  # .reshape((-1, 1 + cfg.n_fft // 2))
 
-    tr_text_data, va_text_data = ljs.text_data[:tr_size], ljs.text_data[tr_size:]
+    tr_text_data, va_text_data = \
+        ljs.text_data[:tr_size], ljs.text_data[tr_size:]
+    tr_text_len_data, va_text_len_data = \
+        ljs.text_len_data[:tr_size], ljs.text_len_data[tr_size:]
     tr_mels, va_mels = ljs.mels[:tr_size], ljs.mels[tr_size:]
     tr_mags, va_mags = ljs.mags[:tr_size], ljs.mags[tr_size:]
 
     del ljs  # memory release
 
     # Data Iterator
-    di = DataIterator(text=tr_text_data, mel=tr_mels, mag=tr_mags,
+    di = DataIterator(text=tr_text_data, text_len=tr_text_len_data,
+                      mel=tr_mels, mag=tr_mags,
                       batch_size=cfg.batch_size)
 
     if cfg.verbose:
         print("[*] Train/Test split : %d/%d (%.2f/%.2f)" % (tr_text_data.shape[0], va_text_data.shape[0],
                                                             1. - cfg.test_size, cfg.test_size))
         print("  Train")
-        print("\ttext : ", tr_text_data.shape)
-        print("\tmels : ", tr_mels.shape)
-        print("\tmags : ", tr_mags.shape)
+        print("\ttext     : ", tr_text_data.shape)
+        print("\ttext_len : ", tr_text_len_data.shape)
+        print("\tmels     : ", tr_mels.shape)
+        print("\tmags     : ", tr_mags.shape)
         print("  Test")
-        print("\ttext : ", va_text_data.shape)
-        print("\tmels : ", va_mels.shape)
-        print("\tmags : ", va_mags.shape)
+        print("\ttext     : ", va_text_data.shape)
+        print("\ttext_len : ", va_text_len_data.shape)
+        print("\tmels     : ", va_mels.shape)
+        print("\tmags     : ", va_mags.shape)
 
     # Model Loading
     gpu_config = tf.GPUOptions(allow_growth=True)
@@ -120,11 +128,12 @@ def main():
         model.global_step.assign(tf.constant(global_step))
         restored_epochs = global_step // (di.text.shape[0] // batch_size)
         for epoch in range(restored_epochs, cfg.epochs):
-            for text, mel, mag in di.iterate():
+            for text, text_len, mel, mag in di.iterate():
                 batch_start = time.time()
                 _, y_loss, z_loss = sess.run([model.train_op, model.y_loss, model.z_loss],
                                              feed_dict={
                                                  model.x: text,
+                                                 model.x_len: text_len,
                                                  model.y: mel,
                                                  model.z: mag,
                                              })
@@ -139,6 +148,7 @@ def main():
                         va_y, va_z = sess.run([model.y_loss, model.z_loss],
                                               feed_dict={
                                                   model.x: va_text_data[va_batch * idx:va_batch * (idx + 1)],
+                                                  model.x_len: va_text_len_data[va_batch * idx:va_batch * (idx + 1)],
                                                   model.y: va_mels[va_batch * idx:va_batch * (idx + 1)],
                                                   model.z: va_mags[va_batch * idx:va_batch * (idx + 1)],
                                               })
@@ -163,6 +173,7 @@ def main():
                     summary = sess.run(model.merged,
                                        feed_dict={
                                            model.x: va_text_data[:batch_size * 4],
+                                           model.x_len: va_text_len_data[:batch_size * 4],
                                            model.y: va_mels[:batch_size * 4],
                                            model.z: va_mags[:batch_size * 4],
                                        })

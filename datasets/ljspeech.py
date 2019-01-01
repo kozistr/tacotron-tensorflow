@@ -48,6 +48,7 @@ class LJSpeech:
 
         # Text data
         self.text_data = list()
+        self.text_len_data = list()
         # Audio data
         self.audio_files = list()
         self.mels, self.mags = list(), list()
@@ -104,7 +105,8 @@ class LJSpeech:
 
             text = self.normalize(text) + "E"
             text = [self.c2i[char] for char in text]
-            self.text_data.append(np.array(text, dtype=np.int32))
+            self.text_data.append(text)
+            self.text_len_data.append(len(text))
 
     def save(self):
         if not os.path.exists(self.processed_path):

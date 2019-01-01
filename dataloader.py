@@ -122,15 +122,17 @@ class Char2VecEmbeddings:
 
 class DataIterator:
 
-    def __init__(self, text, mel, mag, batch_size):
+    def __init__(self, text, text_len, mel, mag, batch_size):
         """ DataLoader
         :param text: An Numpy Object. Text data.
+        :param text_len: An Numpy Object. Text length data.
         :param mel: An Numpy Object. mel-spectrogram data.
         :param mag: An Numpy Object. magnitude data.
         :param y: An Numpy Object. Label audio.
         :param batch_size: An int. Batch size.
         """
         self.text = text
+        self.text_len = text_len
         self.mel = mel
         self.mag = mag
         self.batch_size = batch_size
@@ -150,6 +152,7 @@ class DataIterator:
             np.random.shuffle(perm)
 
             self.text = self.text[perm]
+            self.text_len = self.text_len[perm]
             self.mel = self.mel[perm]
             self.mag = self.mag[perm]
 
@@ -158,7 +161,7 @@ class DataIterator:
 
         end = self.pointer
 
-        return self.text[start:end], self.mel[start:end], self.mag[start:end]
+        return self.text[start:end], self.text_len[start:end], self.mel[start:end], self.mag[start:end]
 
     def iterate(self):
         for step in range(self.num_batches):

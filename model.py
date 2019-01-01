@@ -91,11 +91,13 @@ class Tacotron:
 
         # placeholders
         self.x = tf.placeholder(tf.int32, shape=(None, None),
-                                name="x-text")  # (N, T_x)
+                                name="x-text")             # (N, T_x)
+        self.x_len = tf.placeholder(tf.int32, shape=(None, ),
+                                    name="x-text-length")  # (N, )
         self.y = tf.placeholder(tf.float32, shape=(None, None, self.n_mels * self.reduction_factor),
                                 name="y-mel_spectrogram")  # (N, T_y // r, n_mels * r)
         self.z = tf.placeholder(tf.float32, shape=(None, None, 1 + self.n_fft // 2),
-                                name="z-magnitude")  # (N, T_y, 1 + n_fft // 2)
+                                name="z-magnitude")        # (N, T_y, 1 + n_fft // 2)
 
         # global step
         self.global_step = tf.Variable(0, name='global_step', trainable=False)
@@ -267,6 +269,7 @@ class Tacotron:
         # Summary
         tf.summary.scalar("loss/y_loss", self.y_loss)
         tf.summary.scalar("loss/z_loss", self.z_loss)
+        tf.summary.scalar("loss/loss", self.loss)
         tf.summary.scalar("misc/lr", self.lr)
 
         tf.summary.image("y/mel_gt", tf.expand_dims(self.y, axis=-1), max_outputs=1)
