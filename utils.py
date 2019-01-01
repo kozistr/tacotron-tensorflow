@@ -6,10 +6,12 @@ from config import get_config
 
 from scipy import signal
 
+import matplotlib.pyplot as plt
 import numpy as np
 import librosa
 import copy
 import os
+
 
 __AUTHOR__ = "kozistr"
 __REFERENCE__ = "https://github.com/Kyubyong/tacotron/blob/master/utils.py"
@@ -132,3 +134,26 @@ def load_spectrogram(path):
     mel = np.pad(mel, [[0, n_pads], [0, 0]], mode="constant").reshape((-1, cfg.n_mels * cfg.reduction_factor))
     mag = np.pad(mag, [[0, n_pads], [0, 0]], mode="constant")
     return mel, mag
+
+
+def plot_alignment(alignments, gs=0, path="./alignments"):
+    """ Plotting the alignments
+    :param alignments: A Numpy Object. A list of matrix of
+        shape (encoder_steps, decoder_steps).
+    :param gs: A int. Global steps.
+    :param path: A str. Path for saving alignment image.
+    :return:
+    """
+    if not os.path.exists(path):
+        os.mkdir(path)
+
+        if cfg.verbose:
+            print("[-] %s doesn't exist. make new one" % path)
+
+    fig, ax = plt.subplots()
+    im = ax.imshow(alignments)
+
+    fig.colorbar(im)
+
+    plt.title("{} global steps".format(gs))
+    plt.savefig(os.path.join(path, "alignment_{}.png".format(gs)))
