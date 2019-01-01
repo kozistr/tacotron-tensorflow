@@ -43,13 +43,14 @@ def main():
         raise NotImplementedError("[-] Not Implemented Yet...")
 
     # Train/Test split
-    tr_size = int(len(ljs) * cfg.test_size)
+    tr_size = int(len(ljs) * (1. - cfg.test_size))
     ljs.text_data = np.array(ljs.text_data)
-    ljs.mels, ljs.mags = np.array(ljs.mels),  np.array(ljs.mags)
+    ljs.mels = np.array(ljs.mels)  # .reshape((-1, cfg.n_mels * cfg.sample_rate))
+    ljs.mags = np.array(ljs.mags)  # .reshape((-1, 1 + cfg.n_fft // 2))
 
     tr_text_data, va_text_data = ljs.text_data[:tr_size], ljs.text_data[tr_size:]
-    tr_mels, va_mels = ljs.mels[:tr_size, :], ljs.mels[tr_size:, :]
-    tr_mags, va_mags = ljs.mags[:tr_size, :], ljs.mags[tr_size:, :]
+    tr_mels, va_mels = ljs.mels[:tr_size], ljs.mels[tr_size:]
+    tr_mags, va_mags = ljs.mags[:tr_size], ljs.mags[tr_size:]
 
     del ljs  # memory release
 
@@ -93,6 +94,9 @@ def main():
                              model_path=cfg.model_path)
         else:
             raise NotImplementedError("[-] Not Implemented Yet...")
+
+        if cfg.verbose:
+            print("[*] %s model is loaded!" % cfg.model)
 
         # Initializing
         sess.run(tf.global_variables_initializer())
@@ -144,9 +148,9 @@ def main():
 
                     print("[*] epoch %03d global step %07d" % (epoch, global_step),
                           " Train \n"
-                          " y_loss : {:.8f} z_loss : {:.4f}".format(y_loss, z_loss),
+                          " y_loss : {:.6f} z_loss : {:.6f}".format(y_loss, z_loss),
                           " Valid \n"
-                          " y_loss : {:.8f} z_loss : {:.4f}".format(va_y_loss, va_z_loss)
+                          " y_loss : {:.6f} z_loss : {:.6f}".format(va_y_loss, va_z_loss)
                           )
 
                     # summary
