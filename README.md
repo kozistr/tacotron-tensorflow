@@ -26,6 +26,24 @@ highly inspired by [here](https://github.com/Rayhane-mamah/Tacotron-2)
 
 ## Source Tree
 
+```
+│
+├── assets
+│    └── images       (readme images)
+├── datasets
+│    ├── ljspeech.py  (LJSpeech 1.1 DataSet)
+│    └── ...
+├── model
+│    └── log data     (readme images)
+├── config.py         (whole configuration)
+├── dataloader.py     (data loading stuff)
+├── model.py          (lots of TTS models)
+├── modules.py        (lots of modules frequently used at model)
+├── synthesize.py     (inference)
+├── train.py          (model training)
+├── utils.py          (useful utils)
+└── tfutils.py        (useful TF utils)
+```
 
 ## Model Architecture
 
@@ -35,7 +53,7 @@ highly inspired by [here](https://github.com/Rayhane-mamah/Tacotron-2)
 ### Tacotron 2
 ![architecture](./assets/tacotron-2.png)
 
-### DeepVoice V2
+### DeepVoice v2
 
 soon!
 
