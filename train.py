@@ -115,6 +115,7 @@ def main():
 
         start_time = time.time()
 
+        best_loss = np.inf
         batch_size = cfg.batch_size
         model.global_step.assign(tf.constant(global_step))
         restored_epochs = global_step // (di.text.shape[0] // batch_size)
@@ -170,8 +171,15 @@ def main():
                     model.writer.add_summary(summary, global_step)
 
                     # Model save
-                    model.saver.save(sess, cfg.model_path + '%s.ckpt' % cfg.model,
+                    model.saver.save(sess,
+                                     cfg.model_path + '%s.ckpt' % cfg.model,
                                      global_step=global_step)
+
+                    if va_y_loss + va_z_loss < best_loss:
+                        model.saver.save(sess,
+                                         cfg.model_path + '%s-best_loss.ckpt' % cfg.model,
+                                         global_step=global_step)
+                        best_loss = va_y_loss + va_z_loss
 
                 model.global_step.assign_add(tf.constant(1))
                 global_step += 1

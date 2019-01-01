@@ -87,6 +87,7 @@ class Tacotron:
         self.merged = None
         self.writer = None
         self.saver = None
+        self.best_saver = None
 
         # placeholders
         self.x = tf.placeholder(tf.int32, shape=(None, None),
@@ -279,6 +280,7 @@ class Tacotron:
 
         # Model Saver
         self.saver = tf.train.Saver(max_to_keep=1)
+        self.best_saver = tf.train.Saver(max_to_keep=1)
         self.writer = tf.summary.FileWriter(self.model_path, self.sess.graph)
 
 
