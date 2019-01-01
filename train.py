@@ -4,8 +4,8 @@ from __future__ import print_function
 from dataloader import DataIterator
 from utils import plot_alignment
 from config import get_config
-from model import DeepVoiceV3
-from model import Tacotron2
+from model import DeepVoiceV3  # lgtm [py/unused-import]
+from model import Tacotron2    # lgtm [py/unused-import]
 from model import Tacotron
 
 import tensorflow as tf
