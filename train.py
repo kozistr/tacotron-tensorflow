@@ -13,7 +13,6 @@ import argparse
 import time
 import os
 
-
 __AUTHOR__ = "kozistr"
 __VERSION__ = "0.1"
 
@@ -169,13 +168,13 @@ def main():
                           " y_loss : {:.6f} z_loss : {:.6f}".format(va_y_loss, va_z_loss)
                           )
 
-                    # summary
+                    # summary & generation
                     summary = sess.run(model.merged,
                                        feed_dict={
-                                           model.x: va_text_data[:batch_size * 4],
-                                           model.x_len: va_text_len_data[:batch_size * 4],
-                                           model.y: va_mels[:batch_size * 4],
-                                           model.z: va_mags[:batch_size * 4],
+                                           model.x: va_text_data[:batch_size],
+                                           model.x_len: va_text_len_data[:batch_size],
+                                           model.y: va_mels[:batch_size],
+                                           model.z: va_mags[:batch_size],
                                        })
 
                     # Summary saver
