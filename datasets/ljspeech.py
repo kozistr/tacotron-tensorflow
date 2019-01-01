@@ -75,6 +75,12 @@ class LJSpeech:
         self.mels = np.array(self.mels)
         self.mags = np.array(self.mags)
 
+        if self.verbose:
+            print("[*] text data     : ", self.text_data.shape)
+            print("[*] text len data : ", self.text_len_data.shape)
+            print("[*] mel data      : ", self.mels.shape)
+            print("[*] mag data      : ", self.mags.shape)
+
     def char2idx(self):
         return {char: idx for idx, char in enumerate(self.vocab)}
 
@@ -116,7 +122,7 @@ class LJSpeech:
             text = [self.c2i[char] for char in text]
 
             self.text_len_data.append(len(text))
-            self.text_data.append(np.array(text, dtype=np.int32))
+            self.text_data.append(text)
 
     def save(self):
         if not os.path.exists(self.processed_path):
