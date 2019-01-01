@@ -76,6 +76,7 @@ class Tacotron:
         self.memory = None
         self.y_hat = None
         self.z_hat = None
+        self.alignments = None
         self.audio = None
 
         self.y_loss = None
@@ -91,13 +92,13 @@ class Tacotron:
 
         # placeholders
         self.x = tf.placeholder(tf.int32, shape=(None, None),
-                                name="x-text")             # (N, T_x)
-        self.x_len = tf.placeholder(tf.int32, shape=(None, ),
+                                name="x-text")  # (N, T_x)
+        self.x_len = tf.placeholder(tf.int32, shape=(None,),
                                     name="x-text-length")  # (N, )
         self.y = tf.placeholder(tf.float32, shape=(None, None, self.n_mels * self.reduction_factor),
                                 name="y-mel_spectrogram")  # (N, T_y // r, n_mels * r)
         self.z = tf.placeholder(tf.float32, shape=(None, None, 1 + self.n_fft // 2),
-                                name="z-magnitude")        # (N, T_y, 1 + n_fft // 2)
+                                name="z-magnitude")  # (N, T_y, 1 + n_fft // 2)
 
         # global step
         self.global_step = tf.Variable(0, name='global_step', trainable=False)
@@ -226,10 +227,10 @@ class Tacotron:
             self.memory = self.encoder(inputs=self.encoder_inputs,
                                        is_training=self.is_training)  # (N, T_x, E)
 
-            # Pre-Decoder
-            self.y_hat, alignments = self.pre_decoder(inputs=self.decoder_inputs,
-                                                      memory=self.memory,
-                                                      is_training=self.is_training)  # (N, T_y // r, n_mels * r)
+            # Pre-DecoderA
+            self.y_hat, self.alignments = self.pre_decoder(inputs=self.decoder_inputs,
+                                                           memory=self.memory,
+                                                           is_training=self.is_training)  # (N, T_y // r, n_mels * r)
 
             # Post-Decoder
             self.z_hat = self.post_decoder(inputs=self.y_hat,
