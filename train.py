@@ -2,6 +2,7 @@
 from __future__ import print_function
 
 from dataloader import DataIterator
+from utils import plot_alignment
 from config import get_config
 from model import DeepVoiceV3
 from model import Tacotron2
@@ -168,7 +169,7 @@ def main():
                           " y_loss : {:.6f} z_loss : {:.6f}".format(va_y_loss, va_z_loss)
                           )
 
-                    # summary & generation
+                    # summary
                     summary = sess.run(model.merged,
                                        feed_dict={
                                            model.x: va_text_data[:batch_size],
@@ -176,6 +177,18 @@ def main():
                                            model.y: va_mels[:batch_size],
                                            model.z: va_mags[:batch_size],
                                        })
+
+                    # getting/plotting alignment (important)
+                    alignment = sess.run(model.alignments,
+                                         feed_dict={
+                                             model.x: va_text_data[:batch_size],
+                                             model.x_len: va_text_len_data[:batch_size],
+                                             model.y: va_mels[:batch_size],
+                                         })
+
+                    plot_alignment(alignments=alignment,
+                                   gs=global_step,
+                                   path=os.path.join(cfg.model_path, "alignments"))
 
                     # Summary saver
                     model.writer.add_summary(summary, global_step)
