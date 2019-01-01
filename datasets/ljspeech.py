@@ -105,8 +105,9 @@ class LJSpeech:
 
             text = self.normalize(text) + "E"
             text = [self.c2i[char] for char in text]
-            self.text_data.append(text)
+
             self.text_len_data.append(len(text))
+            self.text_data.append(np.array(text, dtype=np.int32))
 
     def save(self):
         if not os.path.exists(self.processed_path):
