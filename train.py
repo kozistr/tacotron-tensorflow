@@ -120,12 +120,14 @@ def main():
         restored_epochs = global_step // (di.text.shape[0] // batch_size)
         for epoch in range(restored_epochs, cfg.epochs):
             for text, mel, mag in di.iterate():
+                batch_start = time.time()
                 _, y_loss, z_loss = sess.run([model.train_op, model.y_loss, model.z_loss],
                                              feed_dict={
                                                  model.x: text,
                                                  model.y: mel,
                                                  model.z: mag,
                                              })
+                batch_end = time.time()
 
                 if global_step and global_step % cfg.logging_step == 0:
                     va_y_loss, va_z_loss = 0., 0.
@@ -146,7 +148,10 @@ def main():
                     va_y_loss /= (va_iter // va_batch)
                     va_z_loss /= (va_iter // va_batch)
 
-                    print("[*] epoch %03d global step %07d" % (epoch, global_step),
+                    print("[*] epoch %03d global step %07d [%.03f sec/step]" % (epoch,
+                                                                                global_step,
+                                                                                (batch_end - batch_start)
+                                                                                ),
                           " Train \n"
                           " y_loss : {:.6f} z_loss : {:.6f}".format(y_loss, z_loss),
                           " Valid \n"
