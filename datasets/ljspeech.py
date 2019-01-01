@@ -111,18 +111,18 @@ class LJSpeech:
                 mel, mag = load_spectrogram(file_path)
 
                 self.audio_files.append(file_name)
-                self.mels.append(mel)  # (None, n_mels * sample_rate)
-                self.mags.append(mag)  # (None, 1 + n_fft // 2)
+                self.mels.append(mel.astype(np.float32))  # (None, n_mels * sample_rate)
+                self.mags.append(mag.astype(np.float32))  # (None, 1 + n_fft // 2)
             else:
                 sound_file = os.path.join(self.processed_path, file_name)
-                self.mels.append(np.load(sound_file + "-mel.npy"))
-                self.mags.append(np.load(sound_file + "-mag.npy"))
+                self.mels.append(np.load(sound_file + "-mel.npy").astype(np.float32))
+                self.mags.append(np.load(sound_file + "-mag.npy").astype(np.float32))
 
             text = self.normalize(text) + "E"
             text = [self.c2i[char] for char in text]
 
-            self.text_len_data.append(len(text))
-            self.text_data.append(text)
+            self.text_len_data.append(np.array(len(text), dtype=np.int32))
+            self.text_data.append(np.array(text, dtype=np.int32))
 
     def save(self):
         if not os.path.exists(self.processed_path):
