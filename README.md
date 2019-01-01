@@ -7,7 +7,7 @@ highly inspired by [here](https://github.com/Rayhane-mamah/Tacotron-2)
 
 ## Requirements
 
-* Python 3.x
+* Python 3.x (preferred)
 * Tensorflow 1.x
 * matplotlib
 * librosa
@@ -16,6 +16,19 @@ highly inspired by [here](https://github.com/Rayhane-mamah/Tacotron-2)
 
 ## Usage
 
+> 0. Download Dataset
+
+* [IJSpeech 1.1](https://keithito.com/LJ-Speech-Dataset/)
+
+> 0. Install ```requirements.txt``` via ```pip```
+
+``` python -m pip install -r requirements.txt ```
+
+> 1. Adjust ```config.py``` (path stuff)
+
+> 2. Just execute ```train.py```
+
+``` python train.py ```
 
 ## DataSet
 
