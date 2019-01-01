@@ -265,7 +265,8 @@ class Tacotron:
         # Gradient Clipping
         gradients, variables = zip(*self.opt.compute_gradients(self.loss))
         gradients, _ = tf.clip_by_global_norm(gradients, self.grad_clip)
-        self.train_op = self.opt.apply_gradients(zip(gradients, variables), global_step=self.global_step)
+        with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
+            self.train_op = self.opt.apply_gradients(zip(gradients, variables), global_step=self.global_step)
 
         # Summary
         tf.summary.scalar("loss/y_loss", self.y_loss)
