@@ -194,9 +194,9 @@ def main():
                                      global_step=global_step)
 
                     if va_y_loss + va_z_loss < best_loss:
-                        model.saver.save(sess,
-                                         cfg.model_path + '%s-best_loss.ckpt' % cfg.model,
-                                         global_step=global_step)
+                        model.best_saver.save(sess,
+                                              cfg.model_path + '%s-best_loss.ckpt' % cfg.model,
+                                              global_step=global_step)
                         best_loss = va_y_loss + va_z_loss
 
                 model.global_step.assign_add(tf.constant(1))
