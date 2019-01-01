@@ -9,6 +9,7 @@ highly inspired by [here](https://github.com/Rayhane-mamah/Tacotron-2)
 
 * Python 3.x
 * Tensorflow 1.x
+* matplotlib
 * librosa
 * numpy
 * tqdm
