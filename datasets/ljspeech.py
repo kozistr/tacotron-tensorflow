@@ -66,6 +66,15 @@ class LJSpeech:
         if self.save_to is not None:
             self.save()
 
+        self.list2np()  # data type conversion into numpy array
+
+    def list2np(self):
+        # to numpy array
+        self.text_data = np.array(self.text_data)
+        self.text_len_data = np.array(self.text_len_data)
+        self.mels = np.array(self.mels)
+        self.mags = np.array(self.mags)
+
     def char2idx(self):
         return {char: idx for idx, char in enumerate(self.vocab)}
 

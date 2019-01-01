@@ -45,11 +45,6 @@ def main():
     # Train/Test split
     tr_size = int(len(ljs) * (1. - cfg.test_size))
 
-    ljs.text_data = np.array(ljs.text_data)
-    ljs.text_len_data = np.array(ljs.text_len_data)
-    ljs.mels = np.array(ljs.mels)  # .reshape((-1, cfg.n_mels * cfg.sample_rate))
-    ljs.mags = np.array(ljs.mags)  # .reshape((-1, 1 + cfg.n_fft // 2))
-
     tr_text_data, va_text_data = \
         ljs.text_data[:tr_size], ljs.text_data[tr_size:]
     tr_text_len_data, va_text_len_data = \
