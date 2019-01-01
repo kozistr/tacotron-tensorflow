@@ -5,6 +5,9 @@ Especially for English, Korean.
 
 highly inspired by [here](https://github.com/Rayhane-mamah/Tacotron-2)
 
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/kozistr/tacotron-tensorflow.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/kozistr/tacotron-tensorflow/alerts/)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/kozistr/tacotron-tensorflow.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/kozistr/tacotron-tensorflow/context:python)
+
 ## Requirements
 
 * Python 3.x (preferred)
