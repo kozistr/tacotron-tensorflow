@@ -19,17 +19,19 @@ highly inspired by [here](https://github.com/Rayhane-mamah/Tacotron-2)
 
 ## Usage
 
-> 0. Download Dataset
+### 0. Download Dataset
 
 * [IJSpeech 1.1](https://keithito.com/LJ-Speech-Dataset/)
 
-> 0. Install ```requirements.txt``` via ```pip```
+### 0. Install Pre-Requisites
 
 ``` python -m pip install -r requirements.txt ```
 
-> 1. Adjust ```config.py``` (path stuff)
+### 1. Adjust Configuration
 
-> 2. Just execute ```train.py```
+``` edit config.py ```
+
+### 2. Train!
 
 ``` python train.py ```
 
